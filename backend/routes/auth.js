@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import fetchUser from '../middleware/fetchUser.js'; // Middleware to fetch user details
 
 const router = express.Router();
+let success = false;
 
 // Route 1: Create a User using: POST "/api/auth/createuser". No login required
 router.post('/createuser',[
@@ -19,6 +20,7 @@ router.post('/createuser',[
   }),
   body('password', 'Password length should be of 8 characters').isLength({min: 8}),
 ], async (req, res) => {
+  let success = false;
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(400).json({ errors: result.array() }); // Return validation errors if any
@@ -41,10 +43,12 @@ router.post('/createuser',[
     const savedUser = await user.save();
 
     var token = jwt.sign(data, process.env.JWT_SECRET);
-    res.json(token); // Send the saved user data as a response
+    success = true;
+    res.json({success: success, token: token}); // Send the saved user data as a response
   } catch (error) {
+    success = false;
     console.error(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send({success: success, error:"Internal Server Error"});
   }
 });
 
@@ -54,6 +58,7 @@ router.post('/login',[
   body('email', 'Enter a valid email').isEmail(),
   body('password', 'Password should not be empty').exists()
 ], async (req, res) => {
+
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(400).json({ errors: result.array() }); // Return validation errors if any
@@ -64,12 +69,14 @@ router.post('/login',[
     // checking if the user exists
     const user = await UserModel.findOne({email: email});
     if (!user) {
-      return res.status(400).json({ error: "Please try to login with correct credentials" });
+      success = false;
+      return res.status(400).json({success: success, error: "Please try to login with correct credentials" });
     }
     // checking if the password is correct
     const passwordCompare = await bcrypt.compare(password, user.password);
     if(!passwordCompare) {
-      return res.status(400).json({ error: "Please try to login with correct credentials" });
+      success = false;
+      return res.status(400).json({success: success, error: "Please try to login with correct credentials" });
     }
     // If the user is authenticated successfully, create a JWT token
     const data = {
@@ -79,11 +86,13 @@ router.post('/login',[
     };
 
     var token = jwt.sign(data, process.env.JWT_SECRET);
-    res.json(token); // Send the saved user data as a response
+    success = true;
+    res.json({success: success, token: token}); // Send the saved user data as a response
     
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Internal Server Error");
+    success = false;
+    res.status(500).send({success: success, error: "Internal Server Error"});
   }
 
 });
