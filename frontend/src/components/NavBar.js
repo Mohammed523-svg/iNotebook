@@ -4,7 +4,8 @@ import { Links, Link, useLocation } from 'react-router-dom'
 const NavBar = () => {
     let location = useLocation();
     React.useEffect(() => {
-        console.log("Location changed:", location.pathname);
+        // This will run when the component mounts or location changes
+        // You can add any side effects here if needed
     }, [location]);
   return (
     <div>

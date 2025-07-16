@@ -4,6 +4,7 @@ import NavBar from './components/NavBar';
 import Home from './components/Home';
 import About from './components/About';
 import NoteState from './context/notes/noteState';
+import Alert from './components/Alert';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <NoteState>
         <BrowserRouter>
           <NavBar />
+          <Alert />
           <Routes>
             <Route path="/" element={<Home/>}/>
             <Route path="/about" element={<About/>}/>

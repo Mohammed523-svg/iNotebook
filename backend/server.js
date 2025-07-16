@@ -4,9 +4,12 @@ dotenv.config();
 import connectDB from './db.js'; // Assuming your connectDB function is in './db.js'
 import authRoutes from './routes/auth.js'; // Your auth route file
 import notesRoutes from './routes/notes.js'; // Your notes route file
+import cors from 'cors';
 
 const app = express();
 const port = 5000;
+app.use(cors()); // Enable CORS for all routes
+app.use(express.urlencoded({ extended: true })); // Middleware to parse URL-encoded bodies
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 
